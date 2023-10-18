@@ -93,29 +93,16 @@ class AddressBook:
             # Обробка винятків, якщо файл відсутній або містить некоректні дані
             pass
 
-    def search_contacts(self, search_term):
+    def search(self, query):
         results = []
+        query = (
+            query.lower()
+        )  # Перетворення рядка пошуку до нижнього регістру для регістронезалежного пошуку
         for record in self.records:
-            name = record.name.value
-            phone = record.phone.value
-
-            # Перевіряємо, чи введений пошуковий термін збігається з ім'ям або номером телефону
-            if search_term.lower() in name.lower() or search_term in phone:
+            if (
+                query in record.name.value.lower()
+                or query in record.phone.value
+                or query in record.email.value.lower()
+            ):
                 results.append(record)
-
         return results
-
-
-def search(self, query):
-    results = []
-    query = (
-        query.lower()
-    )  # Перетворення рядка пошуку до нижнього регістру для регістронезалежного пошуку
-    for record in self.records:
-        if (
-            query in record.name.value.lower()
-            or query in record.phone.value
-            or query in record.email.value.lower()
-        ):
-            results.append(record)
-    return results
