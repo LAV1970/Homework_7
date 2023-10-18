@@ -94,15 +94,25 @@ class AddressBook:
             pass
 
     def search(self, query):
-        results = []
-        query = (
-            query.lower()
-        )  # Перетворення рядка пошуку до нижнього регістру для регістронезалежного пошуку
-        for record in self.records:
-            if (
-                query in record.name.value.lower()
-                or query in record.phone.value
-                or query in record.email.value.lower()
-            ):
-                results.append(record)
-        return results
+    results = []
+    query = (
+        query.lower()
+    )
+    for record in self.records:
+        if (
+            query in record.name.value.lower()
+            or query in record.phone.value
+            or query in record.email.value.lower()
+        ):
+            results.append(record)
+    
+    if results:
+        for result in results:
+            print(f"Name: {result.name.value}")
+            print(f"Phone: {result.phone.value}")
+            print(f"Email: {result.email.value}")
+            print(f"Birthday: {result.birthday.value}")
+            print("\n")
+    else:
+        print("No matching contacts found.")
+    return results
