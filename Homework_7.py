@@ -94,25 +94,64 @@ class AddressBook:
             pass
 
     def search(self, query):
-    results = []
-    query = (
-        query.lower()
-    )
-    for record in self.records:
-        if (
-            query in record.name.value.lower()
-            or query in record.phone.value
-            or query in record.email.value.lower()
-        ):
-            results.append(record)
-    
-    if results:
-        for result in results:
-            print(f"Name: {result.name.value}")
-            print(f"Phone: {result.phone.value}")
-            print(f"Email: {result.email.value}")
-            print(f"Birthday: {result.birthday.value}")
-            print("\n")
-    else:
-        print("No matching contacts found.")
-    return results
+        results = []
+        query = query.lower()
+        for record in self.records:
+            if (
+                query in record.name.value.lower()
+                or query in record.phone.value
+                or query in record.email.value.lower()
+            ):
+                results.append(record)
+        return results
+
+
+if __name__ == "__main__":
+    # Створюємо об'єкт адресної книги
+    address_book = AddressBook()
+
+    while True:
+        print("Меню:")
+        print("1. Додати запис")
+        print("2. Зберегти в файл")
+        print("3. Завантажити з файлу")
+        print("4. Пошук")
+        print("5. Вихід")
+
+        choice = input("Виберіть опцію: ")
+
+        if choice == "1":
+            name = input("Ім'я: ")
+            phone = input("Телефон: ")
+            email = input("Email: ")
+            birthday = input("Дата народження (рік-місяць-день): ")
+
+            # Створюємо запис і додаємо його до адресної книги
+            record = Record(name, phone, email, birthday)
+            address_book.add_record(record)
+
+        elif choice == "2":
+            filename = input("Введіть ім'я файлу для збереження: ")
+            address_book.save_to_file(filename)
+            print(f"Дані збережено у файлі {filename}")
+
+        elif choice == "3":
+            filename = input("Введіть ім'я файлу для завантаження: ")
+            address_book.load_from_file(filename)
+            print(f"Дані завантажено з файлу {filename}")
+
+        elif choice == "4":
+            query = input("Введіть запит для пошуку: ")
+            results = address_book.search(query)
+
+            if results:
+                print("Результати пошуку:")
+                for record in results:
+                    print(
+                        f"Ім'я: {record.name.value}, Телефон: {record.phone.value}, Email: {record.email.value}"
+                    )
+            else:
+                print("Збігів не знайдено")
+
+        elif choice == "5":
+            break
