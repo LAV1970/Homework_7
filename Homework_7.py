@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import re
 
 
@@ -56,11 +57,38 @@ class AddressBook:
     def __init__(self):
         self.records = []
 
-    def __iter__(self):
-        return self.iterator()
+    def add_record(self, record):
+        self.records.append(record)
 
-    def iterator(self, chunk_size=10):
-        current_index = 0
-        while current_index < len(self.records):
-            yield self.records[current_index : current_index + chunk_size]
-            current_index += chunk_size
+    def save_to_file(self, filename):
+        data = {
+            "records": [
+                {
+                    "name": record.name.value,
+                    "phone": record.phone.value,
+                    "email": record.email.value,
+                    "birthday": record.birthday.value,
+                }
+                for record in self.records
+            ]
+        }
+
+        with open(filename, "w") as file:
+            json.dump(data, file)
+
+    def load_from_file(self, filename):
+        try:
+            with open(filename, "r") as file:
+                data = json.load(file)
+
+            for record_data in data.get("records", []):
+                name = record_data.get("name")
+                phone = record_data.get("phone")
+                email = record_data.get("email")
+                birthday = record_data.get("birthday")
+
+                record = Record(name, phone, email, birthday)
+                self.add_record(record)
+        except (FileNotFoundError, json.JSONDecodeError):
+            # Обробка винятків, якщо файл відсутній або містить некоректні дані
+            pass
