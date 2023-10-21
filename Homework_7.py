@@ -138,7 +138,7 @@ class AddressBook(UserDict):
         return results
 
 
-if __name__ == "__main":
+if __name__ == "__main__":
     address_book = AddressBook()
 
     while True:
@@ -171,7 +171,7 @@ if __name__ == "__main":
             address_book.load_from_file(filename)
             print(f"Данные успешно загружены из файла {filename}")
 
-        elif choice == "4":
+        if choice == "4":
             query = input("Введіть запит для пошуку: ")
             results = address_book.search(query)
 
