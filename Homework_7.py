@@ -30,7 +30,6 @@ class Phone(Field):
 
     @staticmethod
     def is_valid_phone(phone):
-        # Обновленное регулярное выражение для номера телефона (ровно 10 цифр)
         pattern = r"^\+?\d{10}$|^\d{10}$"
         return bool(re.match(pattern, phone))
 
@@ -48,10 +47,10 @@ class BirthdayField(Field):
 
 class Record:
     def __init__(self, name, phone, email, birthday=None):
-        self.name = Field(name)
-        self.phone = Field(phone)
+        self.name = Name(name)
+        self.phone = Phone(phone)
         self.email = Field(email)
-        self.birthday = Field(birthday)
+        self.birthday = BirthdayField(birthday)
 
     def set_birthday(self, birthday):
         if not re.match(r"^\d{2}.\d{2}.\d{4}$", birthday):
@@ -124,7 +123,6 @@ class AddressBook(UserDict):
                 record = Record(name, phone, email, birthday)
                 self.add_record(record)
         except (FileNotFoundError, json.JSONDecodeError):
-            # Обробка винятків, якщо файл відсутній або містить некоректні дані
             pass
 
     def search(self, query):
@@ -140,8 +138,7 @@ class AddressBook(UserDict):
         return results
 
 
-if __name__ == "__main__":
-    # Створюємо об'єкт адресної книги
+if __name__ == "__main":
     address_book = AddressBook()
 
     while True:
@@ -152,42 +149,41 @@ if __name__ == "__main__":
         print("4. Пошук")
         print("5. Вихід")
 
-    choice = input("Виберіть опцію: ")
+        choice = input("Виберіть опцію: ")
 
-    if choice == "1":
-        name = input("Ім'я: ")
-        phone = input("Телефон: ")
-        email = input("Email: ")
-        birthday = input("Дата народження (рік-місяць-день): ")
+        if choice == "1":
+            name = input("Ім'я: ")
+            phone = input("Телефон: ")
+            email = input("Email: ")
+            birthday = input("Дата народження (рік-місяць-день): ")
 
-        # Создаем объект записи и добавляем его в адресную книгу
-        record = Record(name, phone, email, birthday)
-        address_book.add_record(record)
-        print("Запис додана до адресної книги")
+            record = Record(name, phone, email, birthday)
+            address_book.add_record(record)
+            print("Запис додана до адресної книги")
 
-    elif choice == "2":
-        filename = input("Введіть ім'я файлу для збереження: ")
-        address_book.save_to_file(filename)
-        print(f"Дані збережено у файлі {filename}")
+        elif choice == "2":
+            filename = input("Введіть ім'я файлу для збереження: ")
+            address_book.save_to_file(filename)
+            print(f"Дані збережено у файлі {filename}")
 
-    elif choice == "3":
-        filename = input("Введите имя файла для загрузки данных: ")
-        address_book.load_from_file(filename)
-        print(f"Данные успешно загружены из файла {filename}")
+        elif choice == "3":
+            filename = input("Введите имя файла для загрузки данных: ")
+            address_book.load_from_file(filename)
+            print(f"Данные успешно загружены из файла {filename}")
 
-    elif choice == "4":
-        query = input("Введіть запит для пошуку: ")
-        results = address_book.search(query)
+        elif choice == "4":
+            query = input("Введіть запит для пошуку: ")
+            results = address_book.search(query)
 
-        if results:
-            print("Результати пошуку:")
-            for record in results:
-                print(
-                    f"Ім'я: {record.name.value}, Телефон: {record.phone.value}, Email: {record.email.value}"
-                )
-        else:
-            print("Збігів не знайдено")
+            if results:
+                print("Результати пошуку:")
+                for record in results:
+                    print(
+                        f"Ім'я: {record.name.value}, Телефон: {record.phone.value}, Email: {record.email.value}"
+                    )
+            else:
+                print("Збігів не знайдено")
 
-    elif choice == "5":
-        print("Вихід з програми.")
-    sys.exit()
+        elif choice == "5":
+            print("Вихід з програми.")
+            break
