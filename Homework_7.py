@@ -1,6 +1,7 @@
+from collections import UserDict
+import re
 from datetime import datetime
 import json
-import re
 
 
 class Field:
@@ -16,6 +17,24 @@ class Field:
         self._value = new_value
 
 
+class Name(Field):
+    def __init__(self, value=None):
+        super().__init__(value)
+
+
+class Phone(Field):
+    def __init__(self, value=None):
+        if not Phone.is_valid_phone(value):
+            raise ValueError("Invalid phone number format")
+        super().__init__(value)
+
+    @staticmethod
+    def is_valid_phone(phone):
+        # Обновленное регулярное выражение для номера телефона (ровно 10 цифр)
+        pattern = r"^\+?\d{10}$|^\d{10}$"
+        return bool(re.match(pattern, phone))
+
+
 class BirthdayField(Field):
     def __init__(self, value=None):
         super().__init__(value)
@@ -29,8 +48,8 @@ class BirthdayField(Field):
 
 class Record:
     def __init__(self, name, phone, email, birthday=None):
-        self.name = Field(name)
-        self.phone = PhoneField(phone)
+        self.name = Name(name)
+        self.phone = Phone(phone)
         self.email = Field(email)
         self.birthday = BirthdayField(birthday)
 
@@ -53,12 +72,22 @@ class Record:
         return days_until_birthday
 
 
-class AddressBook:
-    def __init__(self):
-        self.records = []
-
+class AddressBook(UserDict):
     def add_record(self, record):
-        self.records.append(record)
+        self.data[record.name.value] = record
+
+    def find(self, name):
+        if name in self.data:
+            return self.data[name]
+        else:
+            return None
+
+    def delete(self, name):
+        if name in self.data:
+            del self.data[name]
+            return True
+        else:
+            return False
 
     def save_to_file(self, filename):
         data = {
@@ -69,7 +98,7 @@ class AddressBook:
                     "email": record.email.value,
                     "birthday": record.birthday.value,
                 }
-                for record in self.records
+                for record in self.data.values()
             ]
         }
 
@@ -96,7 +125,7 @@ class AddressBook:
     def search(self, query):
         results = []
         query = query.lower()
-        for record in self.records:
+        for record in self.data.values():
             if (
                 query in record.name.value.lower()
                 or query in record.phone.value
@@ -124,34 +153,4 @@ if __name__ == "__main__":
             name = input("Ім'я: ")
             phone = input("Телефон: ")
             email = input("Email: ")
-            birthday = input("Дата народження (рік-місяць-день): ")
-
-            # Створюємо запис і додаємо його до адресної книги
-            record = Record(name, phone, email, birthday)
-            address_book.add_record(record)
-
-        elif choice == "2":
-            filename = input("Введіть ім'я файлу для збереження: ")
-            address_book.save_to_file(filename)
-            print(f"Дані збережено у файлі {filename}")
-
-        elif choice == "3":
-            filename = input("Введіть ім'я файлу для завантаження: ")
-            address_book.load_from_file(filename)
-            print(f"Дані завантажено з файлу {filename}")
-
-        elif choice == "4":
-            query = input("Введіть запит для пошуку: ")
-            results = address_book.search(query)
-
-            if results:
-                print("Результати пошуку:")
-                for record in results:
-                    print(
-                        f"Ім'я: {record.name.value}, Телефон: {record.phone.value}, Email: {record.email.value}"
-                    )
-            else:
-                print("Збігів не знайдено")
-
-        elif choice == "5":
-            break
+            birthday = input("Дата
