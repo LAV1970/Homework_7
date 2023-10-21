@@ -48,17 +48,22 @@ class BirthdayField(Field):
 
 class Record:
     def __init__(self, name, phone, email, birthday=None):
-        self.name = Name(name)
-        self.phone = Phone(phone)
+        self.name = Field(name)
+        self.phone = Field(phone)
         self.email = Field(email)
-        self.birthday = BirthdayField(birthday)
+        self.birthday = Field(birthday)
+
+    def set_birthday(self, birthday):
+        if not re.match(r"^\d{2}.\d{2}.\d{4}$", birthday):
+            raise ValueError("Birthday must be in the format DD.MM.YYYY")
+        self.birthday.value = birthday
 
     def days_to_birthday(self):
         if self.birthday.value is None:
             return None
 
         try:
-            birthdate = datetime.strptime(self.birthday.value, "%Y-%m-%d")
+            birthdate = datetime.strptime(self.birthday.value, "%d.%m.%Y")
         except ValueError:
             return None
 
@@ -147,10 +152,42 @@ if __name__ == "__main__":
         print("4. Пошук")
         print("5. Вихід")
 
-        choice = input("Виберіть опцію: ")
+    choice = input("Виберіть опцію: ")
 
-        if choice == "1":
-            name = input("Ім'я: ")
-            phone = input("Телефон: ")
-            email = input("Email: ")
-            birthday = input("Дата
+    if choice == "1":
+        name = input("Ім'я: ")
+        phone = input("Телефон: ")
+        email = input("Email: ")
+        birthday = input("Дата народження (рік-місяць-день): ")
+
+        # Создаем объект записи и добавляем его в адресную книгу
+        record = Record(name, phone, email, birthday)
+        address_book.add_record(record)
+        print("Запис додана до адресної книги")
+
+    elif choice == "2":
+        filename = input("Введіть ім'я файлу для збереження: ")
+        address_book.save_to_file(filename)
+        print(f"Дані збережено у файлі {filename}")
+
+    elif choice == "3":
+        filename = input("Введите имя файла для загрузки данных: ")
+        address_book.load_from_file(filename)
+        print(f"Данные успешно загружены из файла {filename}")
+
+    elif choice == "4":
+        query = input("Введіть запит для пошуку: ")
+        results = address_book.search(query)
+
+        if results:
+            print("Результати пошуку:")
+            for record in results:
+                print(
+                    f"Ім'я: {record.name.value}, Телефон: {record.phone.value}, Email: {record.email.value}"
+                )
+        else:
+            print("Збігів не знайдено")
+
+    elif choice == "5":
+        print("Вихід з програми.")
+    sys.exit()
