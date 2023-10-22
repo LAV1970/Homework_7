@@ -156,6 +156,74 @@ class AddressBook:
             pass
 
 
-# Функція для взаємодії з користувачем
-def main():
+if __name__ == "__main__":
     address_book = AddressBook()
+
+    # Функція для взаємодії з користувачем
+    def print_menu():
+        print("Меню:")
+        print("1. Додати запис")
+        print("2. Зберегти в файл (JSON)")
+        print("3. Завантажити з файлу (JSON)")
+        print("4. Зберегти в файл (Pickle)")
+        print("5. Завантажити з файлу (Pickle)")
+        print("6. Пошук")
+        print("7. Вихід")
+
+    while True:
+        print_menu()
+        choice = input("Виберіть опцію: ")
+
+        if choice == "1":
+            name = input("Ім'я: ")
+            phone = input("Телефон: ")
+            email = input("Email: ")
+            birthday = input("Дата народження (рік-місяць-день): ")
+
+            record = Record(name, phone, email, birthday)
+            address_book.add_record(record)
+            print("Запис додана до адресної книги")
+
+        elif choice == "2":
+            filename = input("Введіть ім'я файлу для збереження (JSON): ")
+            if address_book.save_to_json(filename):
+                print(f"Дані збережено у файлі {filename}")
+            else:
+                print("Помилка збереження даних у файл JSON")
+
+        elif choice == "3":
+            filename = input("Введіть ім'я файлу для завантаження (JSON): ")
+            address_book.load_from_json(filename)
+            print(f"Дані завантажено з файлу {filename}")
+
+        elif choice == "4":
+            filename = input("Введіть ім'я файлу для збереження (Pickle): ")
+            if address_book.save_to_pickle(filename):
+                print(f"Дані збережено у файлі {filename}")
+            else:
+                print("Помилка збереження даних у файл Pickle")
+
+        elif choice == "5":
+            filename = input("Введіть ім'я файлу для завантаження (Pickle): ")
+            address_book.load_from_pickle(filename)
+            print(f"Дані завантажено з файлу {filename}")
+
+        elif choice == "6":
+            query = input("Введіть запит для пошуку: ")
+            results = address_book.search(query)
+
+            if results:
+                print("Результати пошуку:")
+                for record in results:
+                    print(
+                        f"Ім'я: {record.name.value}, Телефон: {record.phone.value}, Email: {record.email.value}"
+                    )
+            else:
+                print("Збігів не знайдено")
+
+        elif choice == "7":
+            print("Вихід з програми.")
+            break
+
+        else:
+            print("Неправильний вибір. Будь ласка, виберіть опцію від 1 до 7.")
