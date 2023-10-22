@@ -1,7 +1,7 @@
-from collections import UserDict
 import re
 from datetime import datetime
 import json
+import pickle
 
 
 class Field:
@@ -76,7 +76,10 @@ class Record:
         return days_until_birthday
 
 
-class AddressBook(UserDict):
+class AddressBook:
+    def __init__(self):
+        self.data = {}
+
     def add_record(self, record):
         self.data[record.name.value] = record
 
@@ -93,7 +96,7 @@ class AddressBook(UserDict):
         else:
             return False
 
-    def save_to_file(self, filename):
+    def save_to_json(self, filename):
         data = {
             "records": [
                 {
@@ -109,7 +112,7 @@ class AddressBook(UserDict):
         with open(filename, "w") as file:
             json.dump(data, file)
 
-    def load_from_file(self, filename):
+    def load_from_json(self, filename):
         try:
             with open(filename, "r") as file:
                 data = json.load(file)
@@ -137,53 +140,22 @@ class AddressBook(UserDict):
                 results.append(record)
         return results
 
+    def save_to_pickle(self, filename):
+        try:
+            with open(filename, "wb") as file:
+                pickle.dump(self.data, file)
+            return True
+        except (IOError, pickle.PickleError):
+            return False
 
-if __name__ == "__main__":
+    def load_from_pickle(self, filename):
+        try:
+            with open(filename, "rb") as file:
+                self.data = pickle.load(file)
+        except (FileNotFoundError, pickle.PickleError):
+            pass
+
+
+# Функція для взаємодії з користувачем
+def main():
     address_book = AddressBook()
-
-    while True:
-        print("Меню:")
-        print("1. Додати запис")
-        print("2. Зберегти в файл")
-        print("3. Завантажити з файлу")
-        print("4. Пошук")
-        print("5. Вихід")
-
-        choice = input("Виберіть опцію: ")
-
-        if choice == "1":
-            name = input("Ім'я: ")
-            phone = input("Телефон: ")
-            email = input("Email: ")
-            birthday = input("Дата народження (рік-місяць-день): ")
-
-            record = Record(name, phone, email, birthday)
-            address_book.add_record(record)
-            print("Запис додана до адресної книги")
-
-        elif choice == "2":
-            filename = input("Введіть ім'я файлу для збереження: ")
-            address_book.save_to_file(filename)
-            print(f"Дані збережено у файлі {filename}")
-
-        elif choice == "3":
-            filename = input("Введите имя файла для загрузки данных: ")
-            address_book.load_from_file(filename)
-            print(f"Данные успешно загружены из файла {filename}")
-
-        if choice == "4":
-            query = input("Введіть запит для пошуку: ")
-            results = address_book.search(query)
-
-            if results:
-                print("Результати пошуку:")
-                for record in results:
-                    print(
-                        f"Ім'я: {record.name.value}, Телефон: {record.phone.value}, Email: {record.email.value}"
-                    )
-            else:
-                print("Збігів не знайдено")
-
-        elif choice == "5":
-            print("Вихід з програми.")
-            break
